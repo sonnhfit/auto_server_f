@@ -1,0 +1,225 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+      <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Responsive Admin</title>
+	<!-- BOOTSTRAP STYLES-->
+    <link href="{% static 'chat/assets/css/bootstrap.css' %}" rel="stylesheet" />
+     <!-- FONTAWESOME STYLES-->
+    <link href="{% static 'chat/assets/css/font-awesome.css' %}" rel="stylesheet" />
+        <!-- CUSTOM STYLES-->
+    <link href="{% static 'chat/assets/css/custom.css' %}" rel="stylesheet" />
+     <!-- GOOGLE FONTS-->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+</head>
+<body>
+
+    <div id="wrapper">
+         <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="adjust-nav">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img src="assets/img/logo.png" />
+
+                    </a>
+                    
+                </div>
+              
+                <span class="logout-spn" >
+                  <a href="#" style="color:#fff;">LOGOUT</a>  
+
+                </span>
+            </div>
+        </div>
+        <!-- /. NAV TOP  -->
+        <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu">
+                 
+
+
+                    <li class="active-link">
+                        <a href="index.html" ><i class="fa fa-desktop "></i>Dashboard <span class="badge">Included</span></a>
+                    </li>
+                   
+
+                    <li>
+                        <a href="ui.html"><i class="fa fa-table "></i>UI Elements  <span class="badge">Included</span></a>
+                    </li>
+                    <li>
+                        <a href="blank.html"><i class="fa fa-edit "></i>Blank Page  <span class="badge">Included</span></a>
+                    </li>
+
+
+                    <li>
+                        <a href="#"><i class="fa fa-qrcode "></i>My Link One</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-bar-chart-o"></i>My Link Two</a>
+                    </li>
+
+                    <li>
+                        <a href="#"><i class="fa fa-edit "></i>My Link Three </a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-table "></i>My Link Four</a>
+                    </li>
+                     <li>
+                        <a href="#"><i class="fa fa-edit "></i>My Link Five </a>
+                    </li>
+                    
+                </ul>
+                            </div>
+
+        </nav>
+        <!-- /. NAV SIDE  -->
+        <div id="page-wrapper" >
+            <div id="page-inner">
+      <button id="dangnhap">Đăng nhập facebook</button>
+    <button id="dongff">đóng firefox</button>
+    <button id="btn-like">Like Post</button>
+    <button id="btn-feed">Lướt new feed</button>
+    <button id="btn-like-nhieu">Like nhiều nick</button>
+
+                <br>
+                <input id="id_post" type="text" placeholder="id post" size="100"><br>
+    <input id="chat-message-input" type="text" size="100"><br>
+                <select>
+                    {% for item in list_acount %}
+                    <option>{{ item.userid }}</option>
+                    {% endfor %}
+                </select>
+    <input id="fb_id" type="text" placeholder="fb id" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send">
+
+
+                 <textarea id="cookie" type="text"></textarea><br>
+                <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+            </div>
+             <!-- /. PAGE INNER  -->
+            </div>
+         <!-- /. PAGE WRAPPER  -->
+        </div>
+    <div class="footer">
+      
+    
+            <div class="row">
+                <div class="col-lg-12" >
+                    &copy;  2014 yourdomain.com | Design by: <a href="http://binarytheme.com" style="color:#fff;" target="_blank">www.binarytheme.com</a>
+                </div>
+            </div>
+        </div>
+          
+
+     <!-- /. WRAPPER  -->
+    <!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+    <!-- JQUERY SCRIPTS -->
+    <script src="assets/js/jquery-1.10.2.js"></script>
+      <!-- BOOTSTRAP SCRIPTS -->
+    <script src="assets/js/bootstrap.min.js"></script>
+      <!-- CUSTOM SCRIPTS -->
+    <script src="assets/js/custom.js"></script>
+
+    <script></script>
+
+    {{ room_name|json_script:"room-name" }}
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').value += (data.message + '\n');
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+
+        document.querySelector('#dangnhap').onclick = function(e) {
+            const messageInputDom1 = document.querySelector('#cookie');
+            const cookie = messageInputDom1.value;
+
+            const messageInputDom2 = document.querySelector('#fb_id');
+            const facebook_id = messageInputDom2.value;
+
+
+            chatSocket.send(JSON.stringify({
+                'message': 'dangnhap', 'cookie': cookie, 'facebook_id': facebook_id, 'action': 4
+            }));
+            messageInputDom1.value = '';
+
+        };
+
+         document.querySelector('#dongff').onclick = function(e) {
+            const messageInputDom2 = document.querySelector('#fb_id');
+            const facebook_id = messageInputDom2.value;
+
+            chatSocket.send(JSON.stringify({
+                'message': 'dongff', 'cookie': "", 'action': 5, 'facebook_id': facebook_id
+            }));
+
+        };
+
+        document.querySelector('#btn-like').onclick = function(e) {
+            const id_post = document.querySelector('#id_post');
+            const facebook_id = document.querySelector('#fb_id').value;
+
+            chatSocket.send(JSON.stringify({
+            'action': 1, 'facebook_id': facebook_id, 'id_post': id_post.value
+            }));
+
+        };
+
+         document.querySelector('#btn-feed').onclick = function(e) {
+            const facebook_id = document.querySelector('#fb_id').value;
+
+            chatSocket.send(JSON.stringify({
+            'action': 6, 'facebook_id': facebook_id
+            }));
+
+        };
+
+         document.querySelector('#btn-like-nhieu').onclick = function(e) {
+         const id_post = document.querySelector('#id_post');
+            chatSocket.send(JSON.stringify({
+            'action': 7, 'id_post': id_post.value
+            }));
+
+        };
+
+    </script>
+    
+   
+</body>
+</html>
